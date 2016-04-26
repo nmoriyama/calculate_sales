@@ -34,17 +34,17 @@ public class calculate_sales {
 		try{
 			//コマンドライン引数がない場合
 			if(args.length == 0){
-				System.out.println("予期せぬエラーが発生しました" + System.getProperty("line.separator"));
+				System.out.println("予期せぬエラーが発生しました");
 				return;
 			}
 			if(args.length > 1){
-				System.out.println("予期せぬエラーが発生しました" + System.getProperty("line.separator"));
+				System.out.println("予期せぬエラーが発生しました");
 				return;
 			}
 			File branchFile = new File(args[0] + File.separator +"branch.lst");
 			
 			if(!branchFile.exists()){
-				System.out.println("支店定義ファイルが存在しません" + System.getProperty("line.separator"));
+				System.out.println("支店定義ファイルが存在しません");
 				return;
 			}
 			
@@ -65,27 +65,27 @@ public class calculate_sales {
 					branCodeMap.put(count,branch[0]);//キー:０～ , 要素：支店コード
 					//１行 , が２つ以上多くある もしくは 支店コードが３桁でない 場合
 					if(branch.length != 2 || branch[0].length() != 3){ 
-						System.out.println("支店定義ファイルのフォーマットが不正です" + System.getProperty("line.separator"));
+						System.out.println("支店定義ファイルのフォーマットが不正です");
 						return;
 					}
 					if (!branch[0].matches("^[0-9]+$")) {//数字のみか
-						System.out.println("支店定義ファイルのフォーマットが不正です" + System.getProperty("line.separator"));
+						System.out.println("支店定義ファイルのフォーマットが不正です");
 						return;
 					}
 					count++;
 				}
 			}catch(NumberFormatException e){
-				System.out.println("支店定義ファイルのフォーマットが不正です" + System.getProperty("line.separator"));
+				System.out.println("支店定義ファイルのフォーマットが不正です");
 				return;
 			}catch(ArrayIndexOutOfBoundsException e){
-				System.out.println("支店定義ファイルのフォーマットが不正です" + System.getProperty("line.separator"));
+				System.out.println("支店定義ファイルのフォーマットが不正です");
 				return;
 			}
 			finally {
 				branchBR.close();
 			}
 		}catch(IOException  e){
-			System.out.println("予期せぬエラーが発生しました" + System.getProperty("line.separator"));
+			System.out.println("予期せぬエラーが発生しました");
 			return;
 		}
 		
@@ -95,7 +95,7 @@ public class calculate_sales {
 			File comFile = new File(args[0] + File.separator + "commodity.lst");
 			
 			if(!comFile.exists()){
-				System.out.println("商品定義ファイルが存在しません" + System.getProperty("line.separator"));
+				System.out.println("商品定義ファイルが存在しません");
 				return;
 			}
 			
@@ -112,27 +112,27 @@ public class calculate_sales {
 					comCodeMap.put(count, commodity[0]);//キー:０～ , 要素：商品コード
 					//１行 , が２つ以上多くある もしくは 商品コードが８桁でない 場合
 					if(commodity.length != 2 || commodity[0].length() != 8){
-						System.out.println("商品定義ファイルのフォーマットが不正です" + System.getProperty("line.separator"));
+						System.out.println("商品定義ファイルのフォーマットが不正です");
 						return;
 					}
 					if (!commodity[0].matches("^[0-9a-zA-Z]+$")) {//アルファベット、数字のみか
-						System.out.println("商品定義ファイルのフォーマットが不正です" + System.getProperty("line.separator"));
+						System.out.println("商品定義ファイルのフォーマットが不正です");
 						return;
 					}
 					count++;
 				}
 			}catch(NumberFormatException e){
-				System.out.println("商品定義ファイルのフォーマットが不正です" + System.getProperty("line.separator"));
+				System.out.println("商品定義ファイルのフォーマットが不正です");
 				return;
 			}catch(ArrayIndexOutOfBoundsException e){
-				System.out.println("商品定義ファイルのフォーマットが不正です" + System.getProperty("line.separator"));
+				System.out.println("商品定義ファイルのフォーマットが不正です");
 				return;
 			}
 			finally{
 				comBR.close();
 			}
 		}catch(IOException  e){
-			System.out.println("予期せぬエラーが発生しました" + System.getProperty("line.separator"));
+			System.out.println("予期せぬエラーが発生しました");
 			System.out.println(e);
 			return;
 		}
@@ -152,7 +152,7 @@ public class calculate_sales {
 			}else if(rcdString.endsWith("lst") || rcdString.endsWith("out") || rcdString.endsWith("java")){
 
 			}else{				
-				System.out.println("売上ファイル名が連番になっていません" + System.getProperty("line.separator"));
+				System.out.println("売上ファイル名が連番になっていません");
 				return;
 			}
 		}//rcdファイル探し終わり
@@ -181,10 +181,10 @@ public class calculate_sales {
 					comString = comString.concat(RcdNumber);
 					rcdSalesFile = new File(args[0] + File.separator + comString + ".rcd");
 					if(!rcdSalesFile.exists()){//読み込めなかった場合
-						System.out.println("予期せぬエラーが発生しました" + System.getProperty("line.separator"));
+						System.out.println("予期せぬエラーが発生しました");
 						return;
 					}else{//連番じゃなかった場合
-						System.out.println("売上ファイル名が連番になっていません" + System.getProperty("line.separator"));
+						System.out.println("売上ファイル名が連番になっていません");
 						return;
 					}
 				}		
@@ -199,12 +199,12 @@ public class calculate_sales {
 						dataList.add(rcdSalesFileString);
 						if(k == 0){ //１行目に支店コードがない場合
 							if(!branSalesMap.containsKey(rcdSalesFileString)){
-								System.out.println(comString + ".rcdの支店コードが不正です" + System.getProperty("line.separator"));
+								System.out.println(comString + ".rcdの支店コードが不正です");
 								return;
 							}
 						}else if(k == 1){//２行目に商品コードがない場合
 							if(!comSalesMap.containsKey(rcdSalesFileString)){
-								System.out.println(comString + ".rcdの商品コードが不正です" + System.getProperty("line.separator"));	
+								System.out.println(comString + ".rcdの商品コードが不正です");	
 								return;
 							}
 						}
@@ -212,12 +212,12 @@ public class calculate_sales {
 					}
 
 					if(k < 3){
-						System.out.println(comString + ".rcdのフォーマットが不正です" + System.getProperty("line.separator"));		
+						System.out.println(comString + ".rcdのフォーマットが不正です");		
 						return;
 					}
 				//４行以上の場合
 					if(k > 3){
-						System.out.println(comString + ".rcdのフォーマットが不正です" + System.getProperty("line.separator"));	
+						System.out.println(comString + ".rcdのフォーマットが不正です");	
 						return;
 					}
 				
@@ -227,7 +227,7 @@ public class calculate_sales {
 					comoditySales = comSalesMap.get(dataList.get(1)) + rcdSales;//商品売上
 				
 					if(branchSales >= 1000000000 || comoditySales >= 1000000000){
-						System.out.println("合計金額が10桁を超えました" + System.getProperty("line.separator"));
+						System.out.println("合計金額が10桁を超えました");
 						return;
 					}
 				
@@ -239,7 +239,7 @@ public class calculate_sales {
 					rcdNumber++;
 					dataList.clear();
 				}catch(IOException e){
-					System.out.println("予期せぬエラーが発生しました" + System.getProperty("line.separator"));
+					System.out.println("予期せぬエラーが発生しました");
 					return;
 				}
 				finally{
@@ -248,7 +248,7 @@ public class calculate_sales {
 			}
 			
 		}catch(IOException  e){
-			System.out.println("予期せぬエラーが発生しました" + System.getProperty("line.separator"));
+			System.out.println("予期せぬエラーが発生しました");
 			return;
 		}
 	
@@ -285,14 +285,14 @@ public class calculate_sales {
 					branOutWrite = BranchMap.lowerKey(branOutWrite);
 				}
 			}catch(IOException  e){
-				System.out.println("予期せぬエラーが発生しました" + System.getProperty("line.separator"));
+				System.out.println("予期せぬエラーが発生しました");
 				return;
 			}
 			finally{
 				branOutFileBW.close();
 			}
 		}catch(IOException  e){
-			System.out.println("予期せぬエラーが発生しました" + System.getProperty("line.separator"));
+			System.out.println("予期せぬエラーが発生しました");
 			return;
 		}
 	
@@ -330,7 +330,7 @@ public class calculate_sales {
 				}
 			
 			}catch(IOException e){			
-				System.out.println("予期せぬエラーが発生しました" + System.getProperty("line.separator"));
+				System.out.println("予期せぬエラーが発生しました");
 				return;
 			}	
 			finally{
@@ -338,7 +338,7 @@ public class calculate_sales {
 			}
 	
 		}catch(IOException  e){
-			System.out.println("予期せぬエラーが発生しました" + System.getProperty("line.separator"));
+			System.out.println("予期せぬエラーが発生しました");
 			return;
 		}
 	}

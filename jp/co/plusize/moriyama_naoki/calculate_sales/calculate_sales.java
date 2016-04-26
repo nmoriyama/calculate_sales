@@ -41,8 +41,12 @@ public class calculate_sales {
 				System.out.println("予期せぬエラーが発生しました");
 				return;
 			}
-			File branchFile = new File(args[0] + File.separator +"branch.lst");
-			
+			File branchFile;
+			if(args[0].endsWith(File.separator)){
+				branchFile = new File(args[0] +"branch.lst");
+			}else{
+				branchFile = new File(args[0] + File.separator +"branch.lst");
+			}
 			if(!branchFile.exists()){
 				System.out.println("支店定義ファイルが存在しません");
 				return;
@@ -52,10 +56,10 @@ public class calculate_sales {
 			BufferedReader branchBR = new BufferedReader(branchFR);
 			
 			try{
-				String branchString;
+				String line;
 				int count = 0;
-				while((branchString = branchBR.readLine()) != null){
-					String[] branch = branchString.split(",");// , で分割
+				while((line = branchBR.readLine()) != null){
+					String[] branch = line.split(",");// , で分割
 					/*if(branch[1].indexOf("支店") != 2){
 						System.out.println("支店定義ファイルのフォーマットが不正です");
 						return;
@@ -92,8 +96,12 @@ public class calculate_sales {
 		
 		//2商品定義ファイルの読み込み
 		try{ 
-			File comFile = new File(args[0] + File.separator + "commodity.lst");
-			
+			File comFile;
+			if(args[0].endsWith(File.separator)){
+				comFile = new File(args[0] + "commodity.lst");
+			}else{
+				comFile = new File(args[0] + File.separator + "commodity.lst");
+			}
 			if(!comFile.exists()){
 				System.out.println("商品定義ファイルが存在しません");
 				return;
@@ -103,10 +111,10 @@ public class calculate_sales {
 			BufferedReader comBR = new BufferedReader(comFR);
 			
 			try{
-				String comString;
+				String line;
 				int count = 0;
-				while((comString = comBR.readLine()) != null){
-					String[] commodity = comString.split(",");// , で分割
+				while((line = comBR.readLine()) != null){
+					String[] commodity = line.split(",");// , で分割
 					comSalesMap.put(commodity[0],0);//キー:商品コード , 要素:売上金額
 					comNameMap.put(commodity[0],commodity[1]);//キー:商品コード , 要素:商品名
 					comCodeMap.put(count, commodity[0]);//キー:０～ , 要素：商品コード
@@ -140,16 +148,21 @@ public class calculate_sales {
 		
 		//3集計
 		//売上ファイルのある場所の検索
-		File rcdFile = new File(args[0]);
+		File rcdFile;
+		if(args[0].endsWith(File.separator)){
+			rcdFile = new File(args[0]);
+		}else{
+			rcdFile = new File(args[0]);
+		}
 		String[] rcdFileString = rcdFile.list();
 		for(int i = 0;i <rcdFileString.length;i ++){
-			String rcdString = rcdFileString[i];
+			String line = rcdFileString[i];
 
 			//拡張子がrcd かつ 12桁(８桁+拡張子(.rcd))
-			if(rcdString.endsWith("rcd") && rcdString.length() == 12){
-				Integer.parseInt(rcdString.substring(0,8));//rcdファイルが数字かどうか
-				rcdFileList.add(rcdString);
-			}else if(rcdString.endsWith("lst") || rcdString.endsWith("out") || rcdString.endsWith("java")){
+			if(line.endsWith("rcd") && line.length() == 12){
+				Integer.parseInt(line.substring(0,8));//rcdファイルが数字かどうか
+				rcdFileList.add(line);
+			}else if(line.endsWith("lst") || line.endsWith("out") || line.endsWith("java")){
 
 			}else{				
 				System.out.println("売上ファイル名が連番になっていません");
@@ -192,18 +205,18 @@ public class calculate_sales {
 				BufferedReader rcdSalesFileBR = new BufferedReader(rcdSalesFileFR);
 				try{
 					int branchSales = 0,comoditySales = 0;
-					String rcdSalesFileString;
+					String line;
 					//er = comString;
 					int k=0;
-					while((rcdSalesFileString = rcdSalesFileBR.readLine()) != null){
-						dataList.add(rcdSalesFileString);
+					while((line = rcdSalesFileBR.readLine()) != null){
+						dataList.add(line);
 						if(k == 0){ //１行目に支店コードがない場合
-							if(!branSalesMap.containsKey(rcdSalesFileString)){
+							if(!branSalesMap.containsKey(line)){
 								System.out.println(comString + ".rcdの支店コードが不正です");
 								return;
 							}
 						}else if(k == 1){//２行目に商品コードがない場合
-							if(!comSalesMap.containsKey(rcdSalesFileString)){
+							if(!comSalesMap.containsKey(line)){
 								System.out.println(comString + ".rcdの商品コードが不正です");	
 								return;
 							}
@@ -285,6 +298,7 @@ public class calculate_sales {
 					branOutWrite = BranchMap.lowerKey(branOutWrite);
 				}
 			}catch(IOException  e){
+				branOutFile.delete();
 				System.out.println("予期せぬエラーが発生しました");
 				return;
 			}
@@ -330,6 +344,7 @@ public class calculate_sales {
 				}
 			
 			}catch(IOException e){			
+				comout.delete();
 				System.out.println("予期せぬエラーが発生しました");
 				return;
 			}	

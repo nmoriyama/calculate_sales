@@ -32,10 +32,19 @@ public class calculate_sales {
 		
 		//1支店定義ファイルの読み込み
 		try{
-			File branchFile = new File(args[0] + "\\branch.lst");
+			//コマンドライン引数がない場合
+			if(args.length == 0){
+				System.out.println("予期せぬエラーが発生しました" + System.getProperty("line.separator"));
+				return;
+			}
+			if(args.length > 1){
+				System.out.println("予期せぬエラーが発生しました" + System.getProperty("line.separator"));
+				return;
+			}
+			File branchFile = new File(args[0] + File.separator +"branch.lst");
 			
 			if(!branchFile.exists()){
-				System.out.println("支店定義ファイルが存在しません");
+				System.out.println("支店定義ファイルが存在しません" + System.getProperty("line.separator"));
 				return;
 			}
 			
@@ -47,42 +56,46 @@ public class calculate_sales {
 				int count = 0;
 				while((branchString = branchBR.readLine()) != null){
 					String[] branch = branchString.split(",");// , で分割
+					/*if(branch[1].indexOf("支店") != 2){
+						System.out.println("支店定義ファイルのフォーマットが不正です");
+						return;
+					}*/
 					branSalesMap.put(branch[0],0);//キー:支店コード , 要素:売上金額
 					branNameMap.put(branch[0],branch[1]);//キー:支店コード , 要素:支店名
 					branCodeMap.put(count,branch[0]);//キー:０～ , 要素：支店コード
 					//１行 , が２つ以上多くある もしくは 支店コードが３桁でない 場合
 					if(branch.length != 2 || branch[0].length() != 3){ 
-						System.out.println("支店定義ファイルのフォーマットが不正です");
+						System.out.println("支店定義ファイルのフォーマットが不正です" + System.getProperty("line.separator"));
 						return;
 					}
 					if (!branch[0].matches("^[0-9]+$")) {//数字のみか
-						System.out.println("支店定義ファイルのフォーマットが不正です");
+						System.out.println("支店定義ファイルのフォーマットが不正です" + System.getProperty("line.separator"));
 						return;
 					}
 					count++;
 				}
 			}catch(NumberFormatException e){
-				System.out.println("支店定義ファイルのフォーマットが不正です");
+				System.out.println("支店定義ファイルのフォーマットが不正です" + System.getProperty("line.separator"));
 				return;
 			}catch(ArrayIndexOutOfBoundsException e){
-				System.out.println("支店定義ファイルのフォーマットが不正です");
+				System.out.println("支店定義ファイルのフォーマットが不正です" + System.getProperty("line.separator"));
 				return;
 			}
 			finally {
 				branchBR.close();
 			}
 		}catch(IOException  e){
-			System.out.println("予期せぬエラーが発生しました");
+			System.out.println("予期せぬエラーが発生しました" + System.getProperty("line.separator"));
 			return;
 		}
 		
 		
 		//2商品定義ファイルの読み込み
 		try{ 
-			File comFile = new File(args[0] + "\\commodity.lst");
+			File comFile = new File(args[0] + File.separator + "commodity.lst");
 			
 			if(!comFile.exists()){
-				System.out.println("商品定義ファイルが存在しません");
+				System.out.println("商品定義ファイルが存在しません" + System.getProperty("line.separator"));
 				return;
 			}
 			
@@ -99,27 +112,27 @@ public class calculate_sales {
 					comCodeMap.put(count, commodity[0]);//キー:０～ , 要素：商品コード
 					//１行 , が２つ以上多くある もしくは 商品コードが８桁でない 場合
 					if(commodity.length != 2 || commodity[0].length() != 8){
-						System.out.println("商品定義ファイルのフォーマットが不正です");
+						System.out.println("商品定義ファイルのフォーマットが不正です" + System.getProperty("line.separator"));
 						return;
 					}
 					if (!commodity[0].matches("^[0-9a-zA-Z]+$")) {//アルファベット、数字のみか
-						System.out.println("商品定義ファイルのフォーマットが不正です");
+						System.out.println("商品定義ファイルのフォーマットが不正です" + System.getProperty("line.separator"));
 						return;
 					}
 					count++;
 				}
 			}catch(NumberFormatException e){
-				System.out.println("商品定義ファイルのフォーマットが不正です");
+				System.out.println("商品定義ファイルのフォーマットが不正です" + System.getProperty("line.separator"));
 				return;
 			}catch(ArrayIndexOutOfBoundsException e){
-				System.out.println("商品定義ファイルのフォーマットが不正です");
+				System.out.println("商品定義ファイルのフォーマットが不正です" + System.getProperty("line.separator"));
 				return;
 			}
 			finally{
 				comBR.close();
 			}
 		}catch(IOException  e){
-			System.out.println("予期せぬエラーが発生しました");
+			System.out.println("予期せぬエラーが発生しました" + System.getProperty("line.separator"));
 			System.out.println(e);
 			return;
 		}
@@ -136,23 +149,28 @@ public class calculate_sales {
 			if(rcdString.endsWith("rcd") && rcdString.length() == 12){
 				Integer.parseInt(rcdString.substring(0,8));//rcdファイルが数字かどうか
 				rcdFileList.add(rcdString);
+			}else if(rcdString.endsWith("lst") || rcdString.endsWith("out") || rcdString.endsWith("java")){
+
+			}else{				
+				System.out.println("売上ファイル名が連番になっていません" + System.getProperty("line.separator"));
+				return;
 			}
 		}//rcdファイル探し終わり
 
 		
 		//ファイル読み込み
 		try{
-		int rcdNumber = 1;
-		for(int i = 0;i < rcdFileList.size();i ++){
-			String RcdNumber = String.valueOf(rcdNumber);
-			String comString = "0";
-			while(comString.length() < (8 - RcdNumber.length())){
-				comString += "0";
-			}
-			comString = comString.concat(RcdNumber);//comStringにファイル名
+			int rcdNumber = 1;
+			for(int i = 0;i < rcdFileList.size();i ++){
+				String RcdNumber = String.valueOf(rcdNumber);
+				String comString = "0";
+				while(comString.length() < (8 - RcdNumber.length())){
+					comString += "0";
+				}
+				comString = comString.concat(RcdNumber);//comStringにファイル名
 
 			
-				File rcdSalesFile = new File(args[0] + "\\" + comString + ".rcd");
+				File rcdSalesFile = new File(args[0] + File.separator + comString + ".rcd");
 				//連番チェック
 				if(!rcdSalesFile.exists()){//読み込めなかったら
 					RcdNumber = String.valueOf(rcdNumber+1);
@@ -161,12 +179,12 @@ public class calculate_sales {
 						comString += "0";
 					}
 					comString = comString.concat(RcdNumber);
-					rcdSalesFile = new File(args[0] + "\\" + comString + ".rcd");
+					rcdSalesFile = new File(args[0] + File.separator + comString + ".rcd");
 					if(!rcdSalesFile.exists()){//読み込めなかった場合
-						System.out.println("予期せぬエラーが発生しました");
+						System.out.println("予期せぬエラーが発生しました" + System.getProperty("line.separator"));
 						return;
 					}else{//連番じゃなかった場合
-						System.out.println("売上ファイル名が連番になっていません");
+						System.out.println("売上ファイル名が連番になっていません" + System.getProperty("line.separator"));
 						return;
 					}
 				}		
@@ -181,24 +199,25 @@ public class calculate_sales {
 						dataList.add(rcdSalesFileString);
 						if(k == 0){ //１行目に支店コードがない場合
 							if(!branSalesMap.containsKey(rcdSalesFileString)){
-								System.out.println(comString + ".rcdの支店コードが不正です");
+								System.out.println(comString + ".rcdの支店コードが不正です" + System.getProperty("line.separator"));
 								return;
 							}
 						}else if(k == 1){//２行目に商品コードがない場合
 							if(!comSalesMap.containsKey(rcdSalesFileString)){
-								System.out.println(comString + ".rcdの商品コードが不正です");	
+								System.out.println(comString + ".rcdの商品コードが不正です" + System.getProperty("line.separator"));	
 								return;
 							}
 						}
 						k++;
 					}
+
 					if(k < 3){
-						System.out.println("予期せぬエラーが発生しました");
+						System.out.println(comString + ".rcdのフォーマットが不正です" + System.getProperty("line.separator"));		
 						return;
 					}
 				//４行以上の場合
 					if(k > 3){
-						System.out.println(comString + ".rcdのフォーマットが不正です");	
+						System.out.println(comString + ".rcdのフォーマットが不正です" + System.getProperty("line.separator"));	
 						return;
 					}
 				
@@ -208,7 +227,7 @@ public class calculate_sales {
 					comoditySales = comSalesMap.get(dataList.get(1)) + rcdSales;//商品売上
 				
 					if(branchSales >= 1000000000 || comoditySales >= 1000000000){
-						System.out.println("合計金額が10桁を超えました");
+						System.out.println("合計金額が10桁を超えました" + System.getProperty("line.separator"));
 						return;
 					}
 				
@@ -220,7 +239,7 @@ public class calculate_sales {
 					rcdNumber++;
 					dataList.clear();
 				}catch(IOException e){
-					System.out.println("予期せぬエラーが発生しました");
+					System.out.println("予期せぬエラーが発生しました" + System.getProperty("line.separator"));
 					return;
 				}
 				finally{
@@ -229,21 +248,21 @@ public class calculate_sales {
 			}
 			
 		}catch(IOException  e){
-			System.out.println("予期せぬエラーが発生しました");
+			System.out.println("予期せぬエラーが発生しました" + System.getProperty("line.separator"));
 			return;
 		}
 	
 		//4集計結果出力		
 		try{
-			File branOutFile = new File(args[0] + "\\branch.out");
+			File branOutFile = new File(args[0] + File.separator + "branch.out");
 			FileWriter branOutFileFW = new FileWriter(branOutFile);
 			BufferedWriter branOutFileBW = new BufferedWriter(branOutFileFW);	
 			try{
-				int rcdNumber = 1;
+				//int rcdNumber = 1;
 				int count = 0;
 				for(int i = 0;i < branSalesMap.size();i++){
-					String RcdNumber = String.valueOf(rcdNumber);
-					String comString = "0";
+					//String RcdNumber = String.valueOf(rcdNumber);
+					//String comString = "0";
 					
 					/*while(comString.length() < (3-RcdNumber.length())){
 						comString += "0";
@@ -256,7 +275,7 @@ public class calculate_sales {
 						BranchMap.put(branCodeSalesMap.get(branCodeMap.get(count)),branCodeMap.get(count));//treemap にキー:売上金額 要素:支店コード
 					}
 					count++;
-					rcdNumber++;
+					//rcdNumber++;
 				}
 			//書き込み
 				branOutFileBW.write(BranchMap.get(BranchMap.lastKey()) + "," + branNameMap.get(BranchMap.get(BranchMap.lastKey())) + "," + BranchMap.lastKey() + "\r\n");
@@ -266,24 +285,24 @@ public class calculate_sales {
 					branOutWrite = BranchMap.lowerKey(branOutWrite);
 				}
 			}catch(IOException  e){
-				System.out.println("予期せぬエラーが発生しました");
+				System.out.println("予期せぬエラーが発生しました" + System.getProperty("line.separator"));
 				return;
 			}
 			finally{
 				branOutFileBW.close();
 			}
 		}catch(IOException  e){
-			System.out.println("予期せぬエラーが発生しました");
+			System.out.println("予期せぬエラーが発生しました" + System.getProperty("line.separator"));
 			return;
 		}
 	
 		try{		
-			File comout = new File(args[0] + "\\commodity.out");
+			File comout = new File(args[0] + File.separator + "commodity.out");
 			FileWriter comoutFW = new FileWriter(comout);
 			BufferedWriter comoutBW = new BufferedWriter(comoutFW);
 			try{
 
-				int rcdNumber = 1;
+				//int rcdNumber = 1;
 				int count = 0;
 				for(int i = 0;i < comSalesMap.size();i ++){
 				//String RcdNumber = String.valueOf(rcdNumber);
@@ -300,7 +319,7 @@ public class calculate_sales {
 						CommodityMap.put(comCodeSalesMap.get(comCodeMap.get(count)),comCodeMap.get(count));//treemap にキー:売上金額 要素:商品コード
 					}
 					count ++;
-					rcdNumber ++;
+					//rcdNumber ++;
 				}
 			//書き込み
 				comoutBW.write(CommodityMap.get(CommodityMap.lastKey()) + "," + comNameMap.get(CommodityMap.get(CommodityMap.lastKey())) + "," + CommodityMap.lastKey() + "\r\n");
@@ -311,7 +330,7 @@ public class calculate_sales {
 				}
 			
 			}catch(IOException e){			
-				System.out.println("予期せぬエラーが発生しました");
+				System.out.println("予期せぬエラーが発生しました" + System.getProperty("line.separator"));
 				return;
 			}	
 			finally{
@@ -319,7 +338,7 @@ public class calculate_sales {
 			}
 	
 		}catch(IOException  e){
-			System.out.println("予期せぬエラーが発生しました");
+			System.out.println("予期せぬエラーが発生しました" + System.getProperty("line.separator"));
 			return;
 		}
 	}

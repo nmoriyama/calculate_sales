@@ -255,7 +255,6 @@ public class calculate_sales {
 				try{
 					long branchSales = 0,comoditySales = 0;
 					String line;
-					//er = comString;
 					
 					int k=0;
 					while((line = rcdSalesFileBR.readLine()) != null){
@@ -324,16 +323,7 @@ public class calculate_sales {
 				//int rcdNumber = 1;
 				int count = 0;
 				for(int i = 0;i < branSalesMap.size();i++){
-					//String RcdNumber = String.valueOf(rcdNumber);
-					//String comString = "0";
-					
-					/*while(comString.length() < (3-RcdNumber.length())){
-						comString += "0";
-					}
-					comString = comString.concat(RcdNumber);//支店コード
-					if(branCodeSalesMap.get(comString) == null){
-						branCodeSalesMap.put(comString,0);
-					}*/
+
 					if(branCodeSalesMap.get(branCodeMap.get(count)) != null){
 						BranchMap.put(branCodeSalesMap.get(branCodeMap.get(count)),branCodeMap.get(count));//treemap にキー:売上金額 要素:支店コード
 					}
@@ -374,16 +364,7 @@ public class calculate_sales {
 				//int rcdNumber = 1;
 				int count = 0;
 				for(int i = 0;i < comSales.size();i ++){
-				//String RcdNumber = String.valueOf(rcdNumber);
-				/*String comString = "SFT0";	
-				while(comString.length() < (8 - RcdNumber.length())){
-					comString += "0";
-				}
-				comString = comString.concat(RcdNumber);//商品コード*/
-				
-				/*if(comCodeSalesMap.get(comString) == null){
-					comCodeSalesMap.put(comString,0);
-				}*/
+
 					if(comCodeSalesMap.get(comCode.get(count)) != null){
 						CommodityMap.put(comCodeSalesMap.get(comCode.get(count)),comCode.get(count));//treemap にキー:売上金額 要素:商品コード
 					}

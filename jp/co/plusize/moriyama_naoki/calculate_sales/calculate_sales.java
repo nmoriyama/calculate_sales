@@ -274,15 +274,6 @@ public class calculate_sales {
 						k++;
 					}
 
-					/*if(k < 3){
-						System.out.println(comString + ".rcdのフォーマットが不正です");		
-						return;
-					}
-				//４行以上の場合
-					if(k > 3){
-						System.out.println(comString + ".rcdのフォーマットが不正です");	
-						return;
-					}*/
 					if(k != 3){
 						System.out.println(comString + ".rcdのフォーマットが不正です");	
 						return;

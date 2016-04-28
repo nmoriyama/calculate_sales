@@ -275,7 +275,7 @@ public class calculate_sales {
 	        });
 			//ここまで
 	        File branchOut = new File(args[0] + File.separator + "branch.out");
-			branchOut.createNewFile();
+			//branchOut.createNewFile();
 			FileWriter fileWriter = new FileWriter(branchOut);
 			BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);	
 			try{
@@ -283,7 +283,7 @@ public class calculate_sales {
 		            bufferedWriter.write(s.getKey() + "," + branName.get(s.getKey()) + "," + s.getValue() + "\r\n");
 		        }
 			}catch(IOException  e){
-				branchOut.deleteOnExit() ;
+				//branchOut.deleteOnExit() ;
 				System.out.println("予期せぬエラーが発生しました");
 				return;
 			}
@@ -304,7 +304,7 @@ public class calculate_sales {
 	        	return ((Integer)sort2.getValue()).compareTo((Integer)sort1.getValue());
 	        }});
 			File comout = new File(args[0] + File.separator + "commodity.out");
-			comout.createNewFile();
+			//comout.createNewFile();
 			FileWriter fileWriter = new FileWriter(comout);
 			BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
 			try{
@@ -312,7 +312,7 @@ public class calculate_sales {
 		            bufferedWriter.write(s.getKey() + "," + comName.get(s.getKey()) + "," + s.getValue() + "\r\n");
 		        }
 			}catch(IOException e){		
-				comout.deleteOnExit() ;
+				//comout.deleteOnExit() ;
 				System.out.println("予期せぬエラーが発生しました");
 				return;
 			}	

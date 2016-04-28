@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.TreeMap;
 
 public class calculate_sales {
 	public static void main(String[] args){
@@ -30,11 +29,6 @@ public class calculate_sales {
 		HashMap<String,String> comName = new HashMap<String,String>();
 		HashMap<Integer,String> comCode = new HashMap<Integer,String>();
 		HashMap<String,Integer> comCodeSales = new HashMap<String,Integer>();
-		
-		
-		//TreeMap<Integer,String> BranchMap = new TreeMap<Integer,String>();
-		//Map<String, Integer> BranSort = new HashMap<String, Integer>();
-		TreeMap<Integer,String> CommodityMap = new TreeMap<Integer,String>();
 
 		int rcdSize = 0;
 		
@@ -298,32 +292,9 @@ public class calculate_sales {
 			FileWriter branOutFileFW = new FileWriter(branOutFile);
 			BufferedWriter branOutFileBW = new BufferedWriter(branOutFileFW);	
 			try{
-				//int count = 0;
-				//int SortList[];
 				for (Entry<String,Integer> s : entries) {
 		            branOutFileBW.write(s.getKey() + "," + branName.get(s.getKey()) + "," + s.getValue() + "\r\n");
 		        }
-				/*for(int i = 0;i < branSales.size();i++){
-				
-					if(branCodeSalesMap.get(branCode.get(count)) != null){
-						//BranchMap.put(branCodeSalesMap.get(branCode.get(count)),branCode.get(count));//treemap にキー:売上金額 要素:支店コード
-					}
-					count++;
-				}
-			//書き込み
-				branOutFileBW.write(BranchMap.get(BranchMap.lastKey()) + "," + branName.get(BranchMap.get(BranchMap.lastKey())) + "," + BranchMap.lastKey() + "\r\n");
-				int branKey = BranchMap.lastKey();
-				while(BranchMap.lowerKey(branKey) != null){
-					if(branX.containsKey(BranchMap.lowerKey(branKey))){
-						for(int i=0;i < branX.get(BranchMap.lowerKey(branKey));i++){
-							
-						}
-						
-					}else{
-						branOutFileBW.write(BranchMap.get(BranchMap.lowerKey(branKey)) + "," + branName.get(BranchMap.get(BranchMap.lowerKey(branKey))) + "," + BranchMap.lowerKey(branKey) + "\r\n");
-						branKey = BranchMap.lowerKey(branKey);
-					}
-				}*/
 			}catch(IOException  e){
 				branOutFile.deleteOnExit() ;
 				System.out.println("予期せぬエラーが発生しました");
@@ -344,30 +315,15 @@ public class calculate_sales {
 	        public int compare(
 	            Entry<String,Integer> entry1, Entry<String,Integer> entry2) {
 	        	return ((Integer)entry2.getValue()).compareTo((Integer)entry1.getValue());
-	        }
-	        });
+	        }});
 			File comout = new File(args[0] + File.separator + "commodity.out");
 			comout.createNewFile();
 			FileWriter comoutFW = new FileWriter(comout);
 			BufferedWriter comoutBW = new BufferedWriter(comoutFW);
 			try{
-				//int count = 0;
 				for (Entry<String,Integer> s : entries) {
 		            comoutBW.write(s.getKey() + "," + comName.get(s.getKey()) + "," + s.getValue() + "\r\n");
 		        }
-				/*for(int i = 0;i < comSales.size();i ++){
-					if(comCodeSales.get(comCode.get(count)) != null){
-						CommodityMap.put(comCodeSales.get(comCode.get(count)),comCode.get(count));//treemap にキー:売上金額 要素:商品コード
-					}
-					count ++;
-				}
-			//書き込み
-				comoutBW.write(CommodityMap.get(CommodityMap.lastKey()) + "," + comName.get(CommodityMap.get(CommodityMap.lastKey())) + "," + CommodityMap.lastKey() + "\r\n");
-				int comOutWrite = CommodityMap.lastKey();
-				while(CommodityMap.lowerKey(comOutWrite) != null){
-					comoutBW.write(CommodityMap.get(CommodityMap.lowerKey(comOutWrite)) + "," + comName.get(CommodityMap.get(CommodityMap.lowerKey(comOutWrite))) + "," + CommodityMap.lowerKey(comOutWrite) + "\r\n");
-					comOutWrite = CommodityMap.lowerKey(comOutWrite);
-				}*/
 			}catch(IOException e){		
 				comout.deleteOnExit() ;
 				System.out.println("予期せぬエラーが発生しました");
@@ -376,7 +332,6 @@ public class calculate_sales {
 			finally{
 				comoutBW.close();
 			}
-	
 		}catch(IOException  e){
 			System.out.println("予期せぬエラーが発生しました");
 			return;

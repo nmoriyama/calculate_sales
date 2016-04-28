@@ -22,12 +22,12 @@ public class calculate_sales {
 		
 		HashMap<Integer,String> Surch = new HashMap<Integer,String>();
 		
-		Map<String,Integer> branSales = new HashMap<String,Integer>();
+		Map<String,Integer> branSales = new HashMap<String,Integer>();//キー:支店コード , 要素:売上金額
 		HashMap<String,String> branName = new HashMap<String,String>();
 		HashMap<Integer,String> branCode = new HashMap<Integer,String>();
 		HashMap<String,Integer> branCodeSales = new HashMap<String,Integer>();
 		
-		Map<String,Integer> comSales = new HashMap<String,Integer>();
+		Map<String,Integer> comSales = new HashMap<String,Integer>();//キー:商品コード , 要素:売上金額
 		HashMap<String,String> comName = new HashMap<String,String>();
 		HashMap<Integer,String> comCode = new HashMap<Integer,String>();
 		HashMap<String,Integer> comCodeSales = new HashMap<String,Integer>();
@@ -64,7 +64,6 @@ public class calculate_sales {
 				int count = 0;
 				while((line = bufferedReader.readLine()) != null){
 					String[] branch = line.split(",");// , で分割
-					//branSales.put(branch[0],0);//キー:支店コード , 要素:売上金額
 					branName.put(branch[0],branch[1]);//キー:支店コード , 要素:支店名
 					branCode.put(count,branch[0]);//キー:０～ , 要素：支店コード
 					//１行 , が２つ以上多くある もしくは 支店コードが３桁でない 場合
@@ -111,7 +110,6 @@ public class calculate_sales {
 				int count = 0;
 				while((line = bufferedReader.readLine()) != null){
 					String[] commodity = line.split(",");// , で分割
-					//comSales.put(commodity[0],0);//キー:商品コード , 要素:売上金額
 					comName.put(commodity[0],commodity[1]);//キー:商品コード , 要素:商品名
 					comCode.put(count, commodity[0]);//キー:０～ , 要素：商品コード
 					//１行 , が２つ以上多くある もしくは 商品コードが８桁でない 場合
@@ -275,7 +273,6 @@ public class calculate_sales {
 	        	return ((Integer)sort2.getValue()).compareTo((Integer)sort1.getValue());
 	        }
 	        });
-	        
 			//ここまで
 	        File branchOut = new File(args[0] + File.separator + "branch.out");
 			branchOut.createNewFile();

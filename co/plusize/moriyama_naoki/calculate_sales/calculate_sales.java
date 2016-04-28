@@ -18,6 +18,7 @@ public class calculate_sales {
 	public static void main(String[] args){
 		ArrayList<String> dataList = new ArrayList<String>();
 		ArrayList<String> rcdFileList = new ArrayList<String>();
+		ArrayList<Integer> Num = new ArrayList<Integer>();
 		
 		HashMap<Integer,String> Surch = new HashMap<Integer,String>();
 		
@@ -186,18 +187,15 @@ public class calculate_sales {
 		try{
 			for(int i = 0;i < rcdFileList.size() - rcdSize;i ++){
 				File surchFile = new File(args[0] + File.separator + Surch.get(i));
-				
+				int num = Integer.parseInt((Surch.get(i).substring(0,8)));
+				Num.add(i);
 				//連番チェック
-				if(!surchFile.exists()){//読み込めなかったら
-					surchFile = new File(args[0] + File.separator + Surch.get(i+1));
-					if(!surchFile.exists()){//読み込めなかった場合
-						System.out.println("予期せぬエラーが発生しました");
-						return;
-					}else{//連番じゃなかった場合
-						System.out.println("売上ファイル名が連番になっていません");
-						return;
-					}
-				}	
+				if(Num.size() == num){
+				}else{	//読み込めなかったら
+					System.out.println("売上ファイル名が連番になっていません");
+					return;
+					
+				}
 				
 				FileReader fileReader = new FileReader(surchFile);
 				BufferedReader bufferedReader = new BufferedReader(fileReader);

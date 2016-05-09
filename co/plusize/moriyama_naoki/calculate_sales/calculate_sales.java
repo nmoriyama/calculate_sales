@@ -27,8 +27,14 @@ public class calculate_sales {
 
 		Map<String,Integer> comSales = new HashMap<String,Integer>();//キー:商品コード , 要素:売上金額
 		HashMap<String,String> comData = new HashMap<String,String>();
-
-		int rcdSize = 0;
+		String[] branch = new String[2];
+		branch[0] = "branch.lst";
+		branch[1] = "branch.out";
+		String[] commodity = new String[2];
+		commodity[0] = "commodity.lst";
+		commodity[1] = "commodity.out";
+		String FileName = "calculate_sales.java";
+ 		int rcdSize = 0;
 		try{
 			//コマンドライン引数1つじゃない場合
 			if(args.length != 1){
@@ -39,12 +45,12 @@ public class calculate_sales {
 				args[0] = args[0].substring(0,args[0].length()-1);
 			}
 			//定義ファイルの読み込み
-			branData = check(args[0],"branch.lst","支店",3);		 //1支店定義ファイルの読み込み
+			branData = check(args[0],branch[0],"支店",3);		 //1支店定義ファイルの読み込み
 			if(branData.containsKey("error")){
 				System.out.println(branData.get("error"));
 				return;
 			}
-			comData = check(args[0],"commodity.lst","商品",8);		//2商品定義ファイルの読み込み
+			comData = check(args[0],commodity[0],"商品",8);		//2商品定義ファイルの読み込み
 			if(comData.containsKey("error")){
 				System.out.println(comData.get("error"));
 				return;
@@ -52,7 +58,6 @@ public class calculate_sales {
 			//3集計
 			//売上ファイルのある場所の検索
 			File file = new File(args[0]);
-
 			String[] rcdSurch = file.list();
 			for(int i = 0;i < rcdSurch.length;i ++){
 				String line = rcdSurch[i];
@@ -86,7 +91,7 @@ public class calculate_sales {
 					Integer.parseInt(line.substring(0,8));//rcdファイルが数字かどうか
 					Surch.put(i,line);
 					rcdFileList.add(line);
-				}else if(!(line.endsWith("lst") || line.endsWith("out") || line.endsWith("java"))){
+				}else if(!(line.equals(branch[0]) || line.equals(branch[1]) || line.equals(commodity[0]) || line.equals(commodity[1]) || line.equals(FileName))){
 					System.out.println("売上ファイル名が連番になっていません");
 					return;
 				}
@@ -146,8 +151,8 @@ public class calculate_sales {
 				}
 			}
 			//4集計結果出力
-			print(args[0],"branch.out",branSales,branData);
-			print(args[0],"commodity.out",comSales,comData);
+			print(args[0],branch[1],branSales,branData);
+			print(args[0],commodity[1],comSales,comData);
 		}catch(IOException  e){
 			System.out.println("予期せぬエラーが発生しました");
 			return;
@@ -190,6 +195,9 @@ public class calculate_sales {
 						}
 					}else if(Name == "商品"){
 						if (Data[0].matches("^[0-9]{8}$") || Data[0].matches("^[a-zA-Z]{8}$")) {//アルファベット、数字のみか
+							Check.put("error",Name + "定義ファイルのフォーマットが不正です");
+							return Check;
+						}else if(!Data[0].matches("^[0-9a-zA-Z]{8}$")){
 							Check.put("error",Name + "定義ファイルのフォーマットが不正です");
 							return Check;
 						}

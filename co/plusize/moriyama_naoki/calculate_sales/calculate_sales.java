@@ -61,7 +61,6 @@ public class calculate_sales {
 			String[] rcdSurch = file.list();
 			for(int i = 0;i < rcdSurch.length;i ++){
 				String line = rcdSurch[i];
-
 				File[] filelist = file.listFiles();
 				String surch = "0";
 
@@ -72,20 +71,20 @@ public class calculate_sales {
 						while(surch.length() < (8 - surchNum.length())){
 							surch += "0";
 						}
+						
 						surch = surch.concat(surchNum);
 						File surchFile = new File(args[0] + File.separator + surch + ".rcd");
 						if(!surchFile.exists()){
 							//見つからなかったら
-							rcdSize = 1;
-							i++;
+							rcdSize += 1;
+							//i++;
 						}else{
 					//見つかったら
 							System.out.println("売上ファイル名が連番になっていません");
 							return;
 						}
-					}
+					}			
 				}
-
 			//拡張子がrcd かつ 12桁(８桁+拡張子(.rcd))
 				if(line.endsWith("rcd") && line.length() == 12){
 					Integer.parseInt(line.substring(0,8));//rcdファイルが数字かどうか
@@ -94,20 +93,21 @@ public class calculate_sales {
 				}else if(line.equals(branch[0]) || line.equals(branch[1]) || line.equals(commodity[0]) || line.equals(commodity[1]) || line.equals(FileName)){
 					
 				}else{
-					String[] Line = line.split(	File.separator + ".");
-					if(Line[0].length() == 8){
-						long Compare = Integer.parseInt(Line[0].substring(0,8));
-						//line = Line[0].concat(".rcd");
-						Surch.put(i,line);
-						rcdFileList.add(line);
-					}else{
-						System.out.println("売上ファイル名が連番になっていません");
-						return;
-					}
+					if (!filelist[i].isDirectory()){
+						String[] Line = line.split(	File.separator + ".");
+						if(Line[0].length() == 8){
+							long Compare = Integer.parseInt(Line[0].substring(0,8));
+							Surch.put(i,line);
+							rcdFileList.add(line);
+						}else{
+							rcdSize += 1;
+						}	
+					}	
 				}
 			}
 		//rcdファイル探し終わり
 		//ファイル読み込み
+			
 			for(int i = 0;i < rcdFileList.size() - rcdSize;i ++){
 				File surchFile = new File(args[0] + File.separator + Surch.get(i));
 				int num = Integer.parseInt((Surch.get(i).substring(0,8)));

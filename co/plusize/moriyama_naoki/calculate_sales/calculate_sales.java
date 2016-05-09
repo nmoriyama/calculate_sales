@@ -58,7 +58,7 @@ public class calculate_sales {
 			//3集計
 			//売上ファイルのある場所の検索
 			File file = new File(args[0]);
-			String[] rcdSurch = file.list();
+			String[] rcdSurch = file.list();//探すファイルの全部
 			for(int i = 0;i < rcdSurch.length;i ++){
 				String line = rcdSurch[i];
 				File[] filelist = file.listFiles();
@@ -86,9 +86,9 @@ public class calculate_sales {
 				}
 			//拡張子がrcd かつ 12桁(８桁+拡張子(.rcd))
 				if(line.endsWith(".rcd")){
-					if(line.matches("^[0-9]{8}$") && line.length() == 12){
+					String[] Line = line.split(	File.separator + ".");
+					if(Line[0].matches("^[0-9]{8}$") && line.length() == 12){
 						Integer.parseInt(line.substring(0,8));//rcdファイルが数字かどうか
-						System.out.println(line);
 						Surch.put(i,line);
 						rcdFileList.add(line);
 					}else{
@@ -102,7 +102,7 @@ public class calculate_sales {
 						String[] Line = line.split(	File.separator + ".");//名前と拡張子を分ける
 						if(Line[0].matches("^[0-9]{8}$") ){//数字のみか
 							if(Line[0].length() == 8){//８桁か
-								long Compare = Integer.parseInt(Line[0].substring(0,8));
+								//long Compare = Integer.parseInt(Line[0].substring(0,8));
 								Surch.put(i,line);
 								rcdFileList.add(line);
 							}else{
@@ -150,6 +150,7 @@ public class calculate_sales {
 						System.out.println("合計金額が10桁を超えました");
 						return;
 					}
+
 					comSales = together("商品",1,i,surch[1],Surch,8,dataList,comSales,comData); //商品ごとの売り上げ
 					if(comSales.containsKey(Surch.get(i) + "の商品コードが不正です")){
 						System.out.println(Surch.get(i) + "の商品コードが不正です");

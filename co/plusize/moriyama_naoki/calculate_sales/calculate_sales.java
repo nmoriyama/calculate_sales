@@ -91,9 +91,19 @@ public class calculate_sales {
 					Integer.parseInt(line.substring(0,8));//rcdファイルが数字かどうか
 					Surch.put(i,line);
 					rcdFileList.add(line);
-				}else if(!(line.equals(branch[0]) || line.equals(branch[1]) || line.equals(commodity[0]) || line.equals(commodity[1]) || line.equals(FileName))){
-					System.out.println("売上ファイル名が連番になっていません");
-					return;
+				}else if(line.equals(branch[0]) || line.equals(branch[1]) || line.equals(commodity[0]) || line.equals(commodity[1]) || line.equals(FileName)){
+					
+				}else{
+					String[] Line = line.split(	File.separator + ".");
+					if(Line[0].length() == 8){
+						long Compare = Integer.parseInt(Line[0].substring(0,8));
+						//line = Line[0].concat(".rcd");
+						Surch.put(i,line);
+						rcdFileList.add(line);
+					}else{
+						System.out.println("売上ファイル名が連番になっていません");
+						return;
+					}
 				}
 			}
 		//rcdファイル探し終わり
@@ -153,6 +163,12 @@ public class calculate_sales {
 			//4集計結果出力
 			print(args[0],branch[1],branSales,branData);
 			print(args[0],commodity[1],comSales,comData);
+		}catch(ArrayIndexOutOfBoundsException e){
+			System.out.println("売上ファイル名が連番になっていません");
+			return;
+		}catch(NumberFormatException e){
+			System.out.println("売上ファイル名が連番になっていません");
+			return;
 		}catch(IOException  e){
 			System.out.println("予期せぬエラーが発生しました");
 			return;

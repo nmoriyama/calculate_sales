@@ -77,7 +77,6 @@ public class calculate_sales {
 						if(!surchFile.exists()){
 							//見つからなかったら
 							rcdSize += 1;
-							//i++;
 						}else{
 					//見つかったら
 							System.out.println("売上ファイル名が連番になっていません");
@@ -86,22 +85,30 @@ public class calculate_sales {
 					}			
 				}
 			//拡張子がrcd かつ 12桁(８桁+拡張子(.rcd))
-				if(line.endsWith("rcd") && line.length() == 12){
-					Integer.parseInt(line.substring(0,8));//rcdファイルが数字かどうか
-					Surch.put(i,line);
-					rcdFileList.add(line);
+				if(line.endsWith(".rcd")){
+					if(line.matches("^[0-9]{8}$") && line.length() == 12){
+						Integer.parseInt(line.substring(0,8));//rcdファイルが数字かどうか
+						System.out.println(line);
+						Surch.put(i,line);
+						rcdFileList.add(line);
+					}else{
+						System.out.println("売上ファイル名が連番になっていません");
+						return;
+					}
 				}else if(line.equals(branch[0]) || line.equals(branch[1]) || line.equals(commodity[0]) || line.equals(commodity[1]) || line.equals(FileName)){
 					
 				}else{
-					if (!filelist[i].isDirectory()){
-						String[] Line = line.split(	File.separator + ".");
-						if(Line[0].length() == 8){
-							long Compare = Integer.parseInt(Line[0].substring(0,8));
-							Surch.put(i,line);
-							rcdFileList.add(line);
-						}else{
-							rcdSize += 1;
-						}	
+					if (!filelist[i].isDirectory()){//ディレクトリかどうか
+						String[] Line = line.split(	File.separator + ".");//名前と拡張子を分ける
+						if(Line[0].matches("^[0-9]{8}$") ){//数字のみか
+							if(Line[0].length() == 8){//８桁か
+								long Compare = Integer.parseInt(Line[0].substring(0,8));
+								Surch.put(i,line);
+								rcdFileList.add(line);
+							}else{
+								rcdSize += 1;
+							}
+						}
 					}	
 				}
 			}

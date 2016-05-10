@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -23,10 +24,10 @@ public class calculate_sales {
 		HashMap<Integer,String> Surch = new HashMap<Integer,String>();
 
 		Map<String,Integer> branSales = new HashMap<String,Integer>();//キー:支店コード , 要素:売上金額
-		HashMap<String,String> branData = new HashMap<String,String>();
+		Map<String,String> branData = new HashMap<String,String>();
 
 		Map<String,Integer> comSales = new HashMap<String,Integer>();//キー:商品コード , 要素:売上金額
-		HashMap<String,String> comData = new HashMap<String,String>();
+		Map<String,String> comData = new HashMap<String,String>();
 		String[] branch = new String[2];
 		branch[0] = "branch.lst";
 		branch[1] = "branch.out";
@@ -45,11 +46,21 @@ public class calculate_sales {
 			}
 			//定義ファイルの読み込み
 			branData = check(args[0],branch[0],"支店",3);		 //1支店定義ファイルの読み込み
+			Iterator NextSurch = branData.entrySet().iterator();//支店コードをbranSalesに
+			while(NextSurch.hasNext()) {
+				Map.Entry getCode = (Map.Entry)NextSurch.next();
+				branSales.put((String)getCode.getKey(),0);
+			}
 			if(branData.containsKey("error")){
 				System.out.println(branData.get("error"));
 				return;
 			}
 			comData = check(args[0],commodity[0],"商品",8);		//2商品定義ファイルの読み込み
+			NextSurch = comData.entrySet().iterator();
+			while(NextSurch.hasNext()) {
+				Map.Entry getCode = (Map.Entry)NextSurch.next();
+				comSales.put((String)getCode.getKey(),0);
+			}
 			if(comData.containsKey("error")){
 				System.out.println(comData.get("error"));
 				return;
@@ -58,12 +69,12 @@ public class calculate_sales {
 			//売上ファイルのある場所の検索
 			File file = new File(args[0]);
 			String[] AllFile = file.list();//探す場所にあるファイル全部
+			File[] filelist = file.listFiles();
 			for(int i = 0;i < AllFile.length;i ++){
 				String line = AllFile[i];
-				File[] filelist = file.listFiles();
 				if (!filelist[i].isDirectory()){
-					if(line.matches("^[0-9]{8}.rcd$")){//8桁の数字.rcdか
-						
+					if(line.matches("^[0-9]{8}.rcd$")){					
+						//8桁の数字.rcdか
 						Surch.put(rcdsize,line);
 						rcdFileList.add(line);	
 						rcdsize += 1;
@@ -180,10 +191,7 @@ public class calculate_sales {
 							return Check;
 						}
 					}else if(Name == "商品"){
-						if (Data[0].matches("^[0-9]{8}$") || Data[0].matches("^[a-zA-Z]{8}$")) {//アルファベット、数字のみか
-							Check.put("error",Name + "定義ファイルのフォーマットが不正です");
-							return Check;
-						}else if(!Data[0].matches("^[0-9a-zA-Z]{8}$")){
+						if(!Data[0].matches("^[0-9a-zA-Z]{8}$")){
 							Check.put("error",Name + "定義ファイルのフォーマットが不正です");
 							return Check;
 						}
@@ -207,7 +215,7 @@ public class calculate_sales {
 	}
 
 	//支店ごと,商品ごとの売り上げ
-	public static void print(String place,String name,Map<String,Integer> Sales,HashMap<String,String> Data)throws IOException{
+	public static void print(String place,String name,Map<String,Integer> Sales,Map<String,String> Data)throws IOException{
 		String crlf = System.getProperty("line.separator");
 		//並び替え
 		List<Map.Entry<String,Integer>> sort = new ArrayList<Map.Entry<String,Integer>>(Sales.entrySet());
@@ -229,7 +237,7 @@ public class calculate_sales {
 	}
 
 	//各合計売上の計算
-	public static Map<String,Integer> together(String name,int ｋ,int i,String Code,HashMap<Integer,String> Surch,int size,ArrayList<String> List,Map<String,Integer> Sales,HashMap<String,String> Data){
+	public static Map<String,Integer> together(String name,int ｋ,int i,String Code,HashMap<Integer,String> Surch,int size,ArrayList<String> List,Map<String,Integer> Sales,Map<String,String> Data){
 			long  add = 0;
 			if(Code.length() != size || !Data.containsKey(Code)) { //１行目に支店コードがない場合
 				Sales.put(Surch.get(i) + "の" + name + "コードが不正です",1000000001);

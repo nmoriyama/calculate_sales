@@ -33,8 +33,6 @@ public class calculate_sales {
 		String[] commodity = new String[2];
 		commodity[0] = "commodity.lst";
 		commodity[1] = "commodity.out";
-		String FileName = "calculate_sales.java";
- 		int rcdSize = 0;
 		try{
 			//コマンドライン引数1つじゃない場合
 			if(args.length != 1){
@@ -62,65 +60,27 @@ public class calculate_sales {
 			for(int i = 0;i < AllFile.length;i ++){
 				String line = AllFile[i];
 				File[] filelist = file.listFiles();
-				String surch = "0";
-
-				//売上ファイル名のフォルダがある場合
-				if (!filelist[i].isFile()){
-					if (filelist[i].isDirectory()){
-						String surchNum = String.valueOf(i+2);
-						while(surch.length() < (8 - surchNum.length())){
-							surch += "0";
-						}
-						
-						surch = surch.concat(surchNum);
-						File surchFile = new File(args[0] + File.separator + surch + ".rcd");
-						if(!surchFile.exists()){
-							//見つからなかったら
-							rcdSize += 1;
-						}else{
-					//見つかったら
-							System.out.println("売上ファイル名が連番になっていません");
-							return;
-						}
-					}			
-				}
-			//拡張子がrcd かつ 12桁(８桁+拡張子(.rcd))
-				//String[] Line = line.split(	File.separator + ".");//名前と拡張子を分ける
-				if(line.endsWith(".rcd")){
-					String[] Line = line.split(	File.separator + "."); //rcdファイルもしくはフォルダが.rcdで終わる場合のみ
-					if(Line[0].matches("^[0-9]{8}$") && line.length() == 12){
-						//Integer.parseInt(line.substring(0,8));//rcdファイルが数字かどうか
+				if (!filelist[i].isDirectory()){
+					if(line.matches("^[0-9]{8}.rcd$")){//8桁の数字.rcdか
 						Surch.put(i,line);
-						rcdFileList.add(line);
-					}else{
-						System.out.println("売上ファイル名が連番になっていません");
-						return;
+						rcdFileList.add(line);	
 					}
-				}else if(line.equals(branch[0]) || line.equals(branch[1]) || line.equals(commodity[0]) || line.equals(commodity[1]) || line.equals(FileName)){
-					
-				}else{
-					if (!filelist[i].isDirectory()){//ディレクトリかどうか
-						String[] Line = line.split(	File.separator + ".");//ファイルの場合のみ
-						if(Line[0].matches("^[0-9]{8}$") ){//数字のみか
-							if(Line[0].length() == 8){//８桁か
-								//long Compare = Integer.parseInt(Line[0].substring(0,8));
-								Surch.put(i,line);
-								rcdFileList.add(line);
-							}else{
-							
-								rcdSize += 1;
-							}
-						}
-					}	
 				}
 			}
 		//rcdファイル探し終わり
 		//ファイル読み込み
-			
-			for(int i = 0;i < rcdFileList.size() - rcdSize;i ++){
+			for(int i = 0;i < rcdFileList.size();i ++){
 				File surchFile = new File(args[0] + File.separator + Surch.get(i));
-				int num = Integer.parseInt((Surch.get(i).substring(0,8)));
+				
+				int num;
+				if(Surch.containsKey(i)){
+					num = Integer.parseInt(Surch.get(i).substring(0,8));
+				}else{
+					System.out.println("売上ファイル名が連番になっていません");//読み込めなかったら
+					return;
+				}	
 				Num.add(i);
+				
 				//連番チェック
 				if(Num.size() != num){
 					System.out.println("売上ファイル名が連番になっていません");//読み込めなかったら
@@ -152,7 +112,6 @@ public class calculate_sales {
 						System.out.println("合計金額が10桁を超えました");
 						return;
 					}
-
 					comSales = together("商品",1,i,surch[1],Surch,8,dataList,comSales,comData); //商品ごとの売り上げ
 					if(comSales.containsKey(Surch.get(i) + "の商品コードが不正です")){
 						System.out.println(Surch.get(i) + "の商品コードが不正です");
@@ -273,16 +232,13 @@ public class calculate_sales {
 				Sales.put(Surch.get(i) + "の" + name + "コードが不正です",1000000001);
 				return Sales;
 			}
-
 			long rcdSales = new Long(List.get(2));//今回取得した売上
-
 			//売上金額格納
 			if(Sales.containsKey(Code)){
 				add = Sales.get(List.get(ｋ)) + rcdSales;//支店売上
 			}else{
 				add = rcdSales;//支店売上
 			}
-
 			if(add > 1000000000){
 				Sales.put("合計金額が10桁を超えました",1000000001);
 				return Sales;

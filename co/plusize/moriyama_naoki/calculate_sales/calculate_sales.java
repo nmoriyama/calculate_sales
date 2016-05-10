@@ -33,6 +33,7 @@ public class calculate_sales {
 		String[] commodity = new String[2];
 		commodity[0] = "commodity.lst";
 		commodity[1] = "commodity.out";
+		int rcdsize = 0;
 		try{
 			//コマンドライン引数1つじゃない場合
 			if(args.length != 1){
@@ -62,25 +63,27 @@ public class calculate_sales {
 				File[] filelist = file.listFiles();
 				if (!filelist[i].isDirectory()){
 					if(line.matches("^[0-9]{8}.rcd$")){//8桁の数字.rcdか
-						Surch.put(i,line);
+						
+						Surch.put(rcdsize,line);
 						rcdFileList.add(line);	
+						rcdsize += 1;
 					}
 				}
 			}
 		//rcdファイル探し終わり
 		//ファイル読み込み
+
 			for(int i = 0;i < rcdFileList.size();i ++){
 				File surchFile = new File(args[0] + File.separator + Surch.get(i));
 				
 				int num;
 				if(Surch.containsKey(i)){
-					num = Integer.parseInt(Surch.get(i).substring(0,8));
+					num = Integer.parseInt(Surch.get(i).substring(0,8)); //rcdファイル名を数字に
 				}else{
 					System.out.println("売上ファイル名が連番になっていません");//読み込めなかったら
 					return;
 				}	
-				Num.add(i);
-				
+				Num.add(i);//読み込めたらsizeが一つ増える
 				//連番チェック
 				if(Num.size() != num){
 					System.out.println("売上ファイル名が連番になっていません");//読み込めなかったら

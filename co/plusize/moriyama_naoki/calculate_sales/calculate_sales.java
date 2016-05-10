@@ -88,7 +88,7 @@ public class calculate_sales {
 				if(line.endsWith(".rcd")){
 					String[] Line = line.split(	File.separator + ".");
 					if(Line[0].matches("^[0-9]{8}$") && line.length() == 12){
-						Integer.parseInt(line.substring(0,8));//rcdファイルが数字かどうか
+						//Integer.parseInt(line.substring(0,8));//rcdファイルが数字かどうか
 						Surch.put(i,line);
 						rcdFileList.add(line);
 					}else{
@@ -185,7 +185,6 @@ public class calculate_sales {
 	}
 
 
-
 	//支店定義ファイル,商品定義ファイルの読み込み
 	public static HashMap<String,String> check(String place,String fileName,String Name,int size){
 		HashMap<String,String> Check = new HashMap<String,String>();
@@ -195,7 +194,6 @@ public class calculate_sales {
 				Check.put("error",Name + "定義ファイルが存在しません");
 				return Check;
 			}
-			
 			FileReader fileReader = new FileReader(file);
 			BufferedReader bufferedReader = new BufferedReader(fileReader);
 			try{

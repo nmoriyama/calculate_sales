@@ -58,9 +58,9 @@ public class calculate_sales {
 			//3集計
 			//売上ファイルのある場所の検索
 			File file = new File(args[0]);
-			String[] rcdSurch = file.list();//探すファイルの全部
-			for(int i = 0;i < rcdSurch.length;i ++){
-				String line = rcdSurch[i];
+			String[] AllFile = file.list();//探す場所にあるファイル全部
+			for(int i = 0;i < AllFile.length;i ++){
+				String line = AllFile[i];
 				File[] filelist = file.listFiles();
 				String surch = "0";
 
@@ -85,9 +85,9 @@ public class calculate_sales {
 					}			
 				}
 			//拡張子がrcd かつ 12桁(８桁+拡張子(.rcd))
-				String[] Line = line.split(	File.separator + ".");//名前と拡張子を分ける
-				if(Line[1].equals("rcd")){
-					//String[] Line = line.split(	File.separator + ".");
+				//String[] Line = line.split(	File.separator + ".");//名前と拡張子を分ける
+				if(line.endsWith(".rcd")){
+					String[] Line = line.split(	File.separator + "."); //rcdファイルもしくはフォルダが.rcdで終わる場合のみ
 					if(Line[0].matches("^[0-9]{8}$") && line.length() == 12){
 						//Integer.parseInt(line.substring(0,8));//rcdファイルが数字かどうか
 						Surch.put(i,line);
@@ -100,12 +100,14 @@ public class calculate_sales {
 					
 				}else{
 					if (!filelist[i].isDirectory()){//ディレクトリかどうか
+						String[] Line = line.split(	File.separator + ".");//ファイルの場合のみ
 						if(Line[0].matches("^[0-9]{8}$") ){//数字のみか
 							if(Line[0].length() == 8){//８桁か
 								//long Compare = Integer.parseInt(Line[0].substring(0,8));
 								Surch.put(i,line);
 								rcdFileList.add(line);
 							}else{
+							
 								rcdSize += 1;
 							}
 						}

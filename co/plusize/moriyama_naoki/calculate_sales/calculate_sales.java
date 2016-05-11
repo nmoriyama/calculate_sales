@@ -42,7 +42,7 @@ public class calculate_sales {
 				args[0] = args[0].substring(0,args[0].length()-1);
 			}
 			//定義ファイルの読み込み
-			branName = fileScan(args[0],branch[0],"支店",3);		 //1支店定義ファイルの読み込み
+			branName = fileScan(args[0],branch[0],"支店");		 //1支店定義ファイルの読み込み
 			Iterator codeSurch = branName.entrySet().iterator();//支店コードをbranSalesに
 			while(codeSurch.hasNext()) {
 				Map.Entry getCode = (Map.Entry)codeSurch.next();
@@ -52,7 +52,7 @@ public class calculate_sales {
 				System.out.println(branName.get("error"));
 				return;
 			}
-			comName = fileScan(args[0],commodity[0],"商品",8);		//2商品定義ファイルの読み込み
+			comName = fileScan(args[0],commodity[0],"商品");		//2商品定義ファイルの読み込み
 			codeSurch = comName.entrySet().iterator();
 			while(codeSurch.hasNext()) {
 				Map.Entry getCode = (Map.Entry)codeSurch.next();
@@ -147,7 +147,7 @@ public class calculate_sales {
 
 
 	//支店定義ファイル,商品定義ファイルの読み込み
-	public static Map<String,String> fileScan(String place,String lstFile,String category,int codeLength){
+	public static Map<String,String> fileScan(String place,String lstFile,String category){
 		Map<String,String> fileScan = new HashMap<String,String>();
 		try{
 			File file = new File(place + File.separator + lstFile);
@@ -161,13 +161,8 @@ public class calculate_sales {
 				String line;
 				while((line = bufferedReader.readLine()) != null){
 					String[] lineDivision = line.split(",");// , で分割
-					fileScan.put(lineDivision[0],lineDivision[1]);//キー:商品コード , 要素:商品名
-					//１行 , が２つ以上多くある もしくは 商品コードが８桁でない 場合
-					if(lineDivision.length != 2){
-						fileScan.put("error",category + "定義ファイルのフォーマットが不正です");
-						return fileScan;
-					}
-					if (lineDivision[0].length() != codeLength) {//アルファベット、数字のみか
+					fileScan.put(lineDivision[0],lineDivision[1]);//キー:コード , 要素:名前
+					if(lineDivision.length != 2){					//１行 , が２つじゃない
 						fileScan.put("error",category + "定義ファイルのフォーマットが不正です");
 						return fileScan;
 					}
@@ -177,7 +172,7 @@ public class calculate_sales {
 							return fileScan;
 						}
 					}else if(category == "商品"){
-						if(!lineDivision[0].matches("^[0-9a-zA-Z]{8}$")){
+						if(!lineDivision[0].matches("^[0-9a-zA-Z]{8}$")){//英数字か
 							fileScan.put("error",category + "定義ファイルのフォーマットが不正です");
 							return fileScan;
 						}
@@ -202,7 +197,7 @@ public class calculate_sales {
 	//各合計売上の計算
 	public static Map<String,Integer> Aggregate(String category,int i,String code,String rcdFile,int codeLength,ArrayList<String> valueTemp,Map<String,Integer> salesStoring,Map<String,String> codePosition){
 		long  aggregate = 0;
-		if(code.length() != codeLength || !codePosition.containsKey(code)) { //１行目に支店コードがない場合
+		if(code.length() != codeLength || !codePosition.containsKey(code)) { //１行目にコードがない場合
 			salesStoring.put(rcdFile + "の" + category + "コードが不正です",1000000001);
 			return salesStoring;
 		}

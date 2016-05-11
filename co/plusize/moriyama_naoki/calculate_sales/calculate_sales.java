@@ -17,9 +17,9 @@ import java.util.Map.Entry;
 
 public class calculate_sales {
 	public static void main(String[] args){
-		ArrayList<String> dataList = new ArrayList<String>();
+		ArrayList<String> valueTemp = new ArrayList<String>();
 		ArrayList<String> rcdFileList = new ArrayList<String>();
-		ArrayList<Integer> checkNum = new ArrayList<Integer>();
+		ArrayList<Integer> sequenceCheck = new ArrayList<Integer>();
 
 		Map<String,Integer> branSales = new HashMap<String,Integer>();//キー:支店コード , 要素:売上金額
 		Map<String,String> branName = new HashMap<String,String>();
@@ -42,7 +42,7 @@ public class calculate_sales {
 				args[0] = args[0].substring(0,args[0].length()-1);
 			}
 			//定義ファイルの読み込み
-			branName = scanFile(args[0],branch[0],"支店",3);		 //1支店定義ファイルの読み込み
+			branName = fileScan(args[0],branch[0],"支店",3);		 //1支店定義ファイルの読み込み
 			Iterator codeSurch = branName.entrySet().iterator();//支店コードをbranSalesに
 			while(codeSurch.hasNext()) {
 				Map.Entry getCode = (Map.Entry)codeSurch.next();
@@ -52,7 +52,7 @@ public class calculate_sales {
 				System.out.println(branName.get("error"));
 				return;
 			}
-			comName = scanFile(args[0],commodity[0],"商品",8);		//2商品定義ファイルの読み込み
+			comName = fileScan(args[0],commodity[0],"商品",8);		//2商品定義ファイルの読み込み
 			codeSurch = comName.entrySet().iterator();
 			while(codeSurch.hasNext()) {
 				Map.Entry getCode = (Map.Entry)codeSurch.next();
@@ -79,10 +79,10 @@ public class calculate_sales {
 		//ファイル読み込み
 			for(int i = 0;i < rcdFileList.size();i ++){
 				File surchFile = new File(args[0] + File.separator + rcdFileList.get(i));
-				int num = Integer.parseInt(rcdFileList.get(i).substring(0,8)); //rcdファイル名を数字に
-				checkNum.add(i);//読み込めたらsizeが一つ増える
+				int rcdInteger = Integer.parseInt(rcdFileList.get(i).substring(0,8)); //rcdファイル名を数字に
+				sequenceCheck.add(i);//読み込めたらsizeが一つ増える
 				//連番チェック
-				if(checkNum.size() != num){
+				if(sequenceCheck.size() != rcdInteger){
 					System.out.println("売上ファイル名が連番になっていません");//読み込めなかったら
 					return;
 				}
@@ -93,7 +93,7 @@ public class calculate_sales {
 					int j = 0;
 					String surch[] = new String[2];
 					while((line = bufferedReader.readLine()) != null){
-						dataList.add(line);
+						valueTemp.add(line);
 						if(j < 2){
 							surch[j] = line;//surch[0]に支店コード,surch[1]に商品コード
 						}
@@ -104,7 +104,7 @@ public class calculate_sales {
 						System.out.println(rcdFileList.get(i) + "のフォーマットが不正です");
 						return;
 					}
-					branSales = Aggregate("支店",0,i,surch[0],rcdFileList,3,dataList,branSales,branName); //支店ごとの売り上げ
+					branSales = Aggregate("支店",0,surch[0],rcdFileList.get(i),3,valueTemp,branSales,branName); //支店ごとの売り上げ
 					if(branSales.containsKey(rcdFileList.get(i) + "の支店コードが不正です")){
 						System.out.println(rcdFileList.get(i) + "の支店コードが不正です");
 						return;
@@ -112,7 +112,7 @@ public class calculate_sales {
 						System.out.println("合計金額が10桁を超えました");
 						return;
 					}
-					comSales = Aggregate("商品",1,i,surch[1],rcdFileList,8,dataList,comSales,comName); //商品ごとの売り上げ
+					comSales = Aggregate("商品",1,surch[1],rcdFileList.get(i),8,valueTemp,comSales,comName); //商品ごとの売り上げ
 					if(comSales.containsKey(rcdFileList.get(i) + "の商品コードが不正です")){
 						System.out.println(rcdFileList.get(i) + "の商品コードが不正です");
 						return;
@@ -120,7 +120,7 @@ public class calculate_sales {
 						System.out.println("合計金額が10桁を超えました");
 						return;
 					}
-					dataList.clear();
+					valueTemp.clear();
 				}catch(IOException e){
 					System.out.println("予期せぬエラーが発生しました");
 					return;
@@ -147,61 +147,77 @@ public class calculate_sales {
 
 
 	//支店定義ファイル,商品定義ファイルの読み込み
-	public static Map<String,String> scanFile(String place,String fileName,String name,int codeSize){
-		Map<String,String> scanFile = new HashMap<String,String>();
+	public static Map<String,String> fileScan(String place,String lstFile,String category,int codeLength){
+		Map<String,String> fileScan = new HashMap<String,String>();
 		try{
-			File file = new File(place + File.separator + fileName);
+			File file = new File(place + File.separator + lstFile);
 			if(!file.exists()){
-				scanFile.put("error",name + "定義ファイルが存在しません");
-				return scanFile;
+				fileScan.put("error",category + "定義ファイルが存在しません");
+				return fileScan;
 			}
 			FileReader fileReader = new FileReader(file);
 			BufferedReader bufferedReader = new BufferedReader(fileReader);
 			try{
 				String line;
 				while((line = bufferedReader.readLine()) != null){
-					String[] Data = line.split(",");// , で分割
-					scanFile.put(Data[0],Data[1]);//キー:商品コード , 要素:商品名
+					String[] lineDivision = line.split(",");// , で分割
+					fileScan.put(lineDivision[0],lineDivision[1]);//キー:商品コード , 要素:商品名
 					//１行 , が２つ以上多くある もしくは 商品コードが８桁でない 場合
-					if(Data.length != 2){
-						scanFile.put("error",name + "定義ファイルのフォーマットが不正です");
-						return scanFile;
+					if(lineDivision.length != 2){
+						fileScan.put("error",category + "定義ファイルのフォーマットが不正です");
+						return fileScan;
 					}
-					if (Data[0].length() != codeSize) {//アルファベット、数字のみか
-						scanFile.put("error",name + "定義ファイルのフォーマットが不正です");
-						return scanFile;
+					if (lineDivision[0].length() != codeLength) {//アルファベット、数字のみか
+						fileScan.put("error",category + "定義ファイルのフォーマットが不正です");
+						return fileScan;
 					}
-					if(name == "支店"){
-						if (!Data[0].matches("^[0-9]{3}$")) {//数字のみか
-							scanFile.put("error",name + "定義ファイルのフォーマットが不正です");
-							return scanFile;
+					if(category == "支店"){
+						if (!lineDivision[0].matches("^[0-9]{3}$")) {//数字のみか
+							fileScan.put("error",category + "定義ファイルのフォーマットが不正です");
+							return fileScan;
 						}
-					}else if(name == "商品"){
-						if(!Data[0].matches("^[0-9a-zA-Z]{8}$")){
-							scanFile.put("error",name + "定義ファイルのフォーマットが不正です");
-							return scanFile;
+					}else if(category == "商品"){
+						if(!lineDivision[0].matches("^[0-9a-zA-Z]{8}$")){
+							fileScan.put("error",category + "定義ファイルのフォーマットが不正です");
+							return fileScan;
 						}
 					}
 				}
 			}catch(NumberFormatException e){
-				scanFile.put("error",name + "定義ファイルのフォーマットが不正です");
-				return scanFile;
+				fileScan.put("error",category + "定義ファイルのフォーマットが不正です");
+				return fileScan;
 			}catch(ArrayIndexOutOfBoundsException e){
-				scanFile.put("error",name + "定義ファイルのフォーマットが不正です");
-				return scanFile;
+				fileScan.put("error",category + "定義ファイルのフォーマットが不正です");
+				return fileScan;
 			}
 			finally{
 				bufferedReader.close();
 			}
 		}catch(IOException  e){
-			scanFile.put("error","予期せぬエラーが発生しました");
-			return scanFile;
+			fileScan.put("error","予期せぬエラーが発生しました");
+			return fileScan;
 		}
-		return scanFile;
+		return fileScan;
 	}
-
+	//各合計売上の計算
+	public static Map<String,Integer> Aggregate(String category,int i,String code,String rcdFile,int codeLength,ArrayList<String> valueTemp,Map<String,Integer> salesStoring,Map<String,String> codePosition){
+		long  aggregate = 0;
+		if(code.length() != codeLength || !codePosition.containsKey(code)) { //１行目に支店コードがない場合
+			salesStoring.put(rcdFile + "の" + category + "コードが不正です",1000000001);
+			return salesStoring;
+		}
+		long rcdSales = new Long(valueTemp.get(2));//今回取得した売上
+		//売上金額格納	
+		aggregate = salesStoring.get(valueTemp.get(i)) + rcdSales;//支店売上
+		if(aggregate > 1000000000){
+			salesStoring.put("合計金額が10桁を超えました",1000000001);
+			return salesStoring;
+		}
+		salesStoring.put(valueTemp.get(i),(int)aggregate);
+		return salesStoring;
+	}
 	//支店ごと,商品ごとの売り上げ
-	public static void filePrint(String place,String fileName,Map<String,Integer> sales,Map<String,String> name)throws IOException{
+	public static void filePrint(String place,String fileName,Map<String,Integer> sales,Map<String,String> namePosition)throws IOException{
 		String crlf = System.getProperty("line.separator");
 		//並び替え
 		List<Map.Entry<String,Integer>> sort = new ArrayList<Map.Entry<String,Integer>>(sales.entrySet());
@@ -216,33 +232,10 @@ public class calculate_sales {
 		FileWriter fileWriter = new FileWriter(file);
 		BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
 		for (Entry<String,Integer> i : sort) {
-			bufferedWriter.write(i.getKey() + "," + name.get(i.getKey()) + "," + i.getValue() + crlf);
+			bufferedWriter.write(i.getKey() + "," + namePosition.get(i.getKey()) + "," + i.getValue() + crlf);
 		}
 		bufferedWriter.close();
 		return;
 	}
-
-	//各合計売上の計算
-	public static Map<String,Integer> Aggregate(String name,int i,int j,String code,ArrayList<String> surch,int size,ArrayList<String> list,Map<String,Integer> sales,Map<String,String> data){
-		long  add = 0;
-		if(code.length() != size || !data.containsKey(code)) { //１行目に支店コードがない場合
-			sales.put(surch.get(j) + "の" + name + "コードが不正です",1000000001);
-			return sales;
-		}
-		long rcdSales = new Long(list.get(2));//今回取得した売上
-		//売上金額格納	
-		if(sales.containsKey(code)){
-			add = sales.get(list.get(i)) + rcdSales;//支店売上
-		}else{
-			add = rcdSales;//支店売上
-		}
-		if(add > 1000000000){
-			sales.put("合計金額が10桁を超えました",1000000001);
-			return sales;
-		}
-		sales.put(list.get(i),(int)add);
-		return sales;
-	}
-
 }
 

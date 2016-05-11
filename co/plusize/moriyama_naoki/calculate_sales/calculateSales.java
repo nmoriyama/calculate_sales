@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-public class calculateSales {
+public class CalculateSales {
 	public static void main(String[] args){
 		ArrayList<String> valueTemp = new ArrayList<String>();
 		ArrayList<String> rcdFileList = new ArrayList<String>();

@@ -196,9 +196,7 @@ public class CalculateSales {
 		}
 		long rcdSales = new Long(valueTemp.get(2));//今回取得した売上
 		//売上金額格納	
-		
 		aggregate = salesString.get(valueTemp.get(i)) + rcdSales;//支店売上
-		System.out.println(aggregate+"  ,  "+valueTemp.get(i));
 		if(aggregate > 10000000000L){
 			salesString.put("合計金額が10桁を超えました",1000000001);
 			return salesString;

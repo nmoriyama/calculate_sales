@@ -16,21 +16,16 @@ import java.util.Map.Entry;
 
 public class CalculateSales {
 	public static void main(String[] args){
-		ArrayList<String> valueTemp = new ArrayList<String>();
 		ArrayList<String> rcdFileList = new ArrayList<String>();
 		ArrayList<Integer> sequenceCheck = new ArrayList<Integer>();
 		
 		Map<String,Long> branchSales = new HashMap<String,Long>();//キー:支店コード , 要素:売上金額
 		Map<String,String> branchName = new HashMap<String,String>();
-
 		Map<String,Long> commoditySales = new HashMap<String,Long>();//キー:商品コード , 要素:売上金額
 		Map<String,String> commodityName = new HashMap<String,String>();
-		String[] branch = new String[2];
-		branch[0] = "branch.lst";
-		branch[1] = "branch.out";
-		String[] commodity = new String[2];
-		commodity[0] = "commodity.lst";
-		commodity[1] = "commodity.out";
+		
+		String[] branch = {"branch.lst","branch.out"};
+		String[] commodity = {"commodity.lst","commodity.out"};
 		try{
 			//コマンドライン引数1つじゃない場合
 			if(args.length != 1){
@@ -46,7 +41,7 @@ public class CalculateSales {
 				System.out.println(branchName.get("error"));
 				return;
 			}
-			for (String getCode : branchName.keySet()) {
+			for(String getCode : branchName.keySet()){
 				branchSales.put(getCode,0L);
 			}
 			commodityName = fileScan(args[0],commodity[0],"商品");		//2商品定義ファイルの読み込み
@@ -54,7 +49,7 @@ public class CalculateSales {
 				System.out.println(commodityName.get("error"));
 				return;
 			}
-			for (String getCode : commodityName.keySet()) {
+			for(String getCode : commodityName.keySet()){
 				commoditySales.put(getCode,0L);
 			}
 			//3集計
@@ -63,13 +58,10 @@ public class CalculateSales {
 			String[] allFile = file.list();//探す場所にあるファイル全部
 			File[] checkDirectory = file.listFiles();
 			for(int i = 0;i < allFile.length;i ++){
-				String line = allFile[i];
-				if (!checkDirectory[i].isDirectory()){
-					if(line.matches("^[0-9]{8}.rcd$")){	//8桁の数字.rcdか				
-						rcdFileList.add(line);	
-					}
+				if(!checkDirectory[i].isDirectory() && allFile[i].matches("^[0-9]{8}.rcd$")){	//8桁の数字.rcdか				
+					rcdFileList.add(allFile[i]);
 				}
-			}
+			}		
 		//ファイル読み込み
 			for(int i = 0;i < rcdFileList.size();i ++){
 				File surchFile = new File(args[0] + File.separator + rcdFileList.get(i));
@@ -84,36 +76,34 @@ public class CalculateSales {
 				BufferedReader bufferedReader = new BufferedReader(fileReader);
 				try{
 					String line;
-					int j = 0;
-					String surch[] = new String[2];
+					ArrayList<String> rcdContent = new ArrayList<String>();
 					while((line = bufferedReader.readLine()) != null){
-						valueTemp.add(line);
-						if(j < 2){
-							surch[j] = line;//surch[0]に支店コード,surch[1]に商品コード
-						}
-						j++;
+						rcdContent.add(line);
 					}
-					if(j != 3){					//３行じゃない場合
+					if(rcdContent.size() != 3){//３行じゃない場合
 						System.out.println(rcdFileList.get(i) + "のフォーマットが不正です");
 						return;
 					}
-					branchSales = aggregate("支店",0,surch[0],rcdFileList.get(i),3,valueTemp,branchSales,branchName); //支店ごとの売り上げ
-					if(branchSales.containsKey(rcdFileList.get(i) + "の支店コードが不正です")){
+					if(rcdContent.get(i).length() != 3 || !branchName.containsKey(rcdContent.get(i))){ //１行目にコードがない場合
+						branchSales.put("error",10000000001L);
 						System.out.println(rcdFileList.get(i) + "の支店コードが不正です");
 						return;
-					}else if(branchSales.containsKey("合計金額が10桁を超えました")){
-						System.out.println("合計金額が10桁を超えました");
+					}else{
+						branchSales = aggregate("支店",0,rcdContent,branchSales); //支店ごとの売り上げ
+					}
+					if(branchSales.containsKey("error")){
 						return;
 					}
-					commoditySales = aggregate("商品",1,surch[1],rcdFileList.get(i),8,valueTemp,commoditySales,commodityName); //商品ごとの売り上げ
-					if(commoditySales.containsKey(rcdFileList.get(i) + "の商品コードが不正です")){
-						System.out.println(rcdFileList.get(i) + "の商品コードが不正です");
+					if(rcdContent.get(i).length() != 8 || !commodityName.containsKey(rcdContent.get(i))){ //１行目にコードがない場合
+						branchSales.put("error",10000000001L);
+						System.out.println(rcdFileList.get(i) + "の支店コードが不正です");
 						return;
-					}else if(commoditySales.containsKey("合計金額が10桁を超えました")){
-						System.out.println("合計金額が10桁を超えました");
-						return;
+					}else{
+						commoditySales = aggregate("商品",1,rcdContent,commoditySales); //商品ごとの売り上げ
 					}
-					valueTemp.clear();
+					if(commoditySales.containsKey("error")){
+						return;
+					}	
 				}catch(IOException e){
 					System.out.println("予期せぬエラーが発生しました");
 					return;
@@ -122,7 +112,7 @@ public class CalculateSales {
 					bufferedReader.close();
 				}
 			}
-			//4集計結果出力
+					//4集計結果出力
 			filePrint(args[0],branch[1],branchSales,branchName);
 			filePrint(args[0],commodity[1],commoditySales,commodityName);
 		}catch(ArrayIndexOutOfBoundsException e){
@@ -135,7 +125,6 @@ public class CalculateSales {
 			System.out.println("予期せぬエラーが発生しました");
 			return;
 		}
-
 	}
 
 
@@ -160,7 +149,7 @@ public class CalculateSales {
 						return fileScan;
 					}
 					if(category == "支店"){
-						if (!lineDivision[0].matches("^[0-9]{3}$")) {//数字のみか
+						if(!lineDivision[0].matches("^[0-9]{3}$")){//数字のみか
 							fileScan.put("error",category + "定義ファイルのフォーマットが不正です");
 							return fileScan;
 						}
@@ -181,45 +170,41 @@ public class CalculateSales {
 			finally{
 				bufferedReader.close();
 			}
-		}catch(IOException  e){
+		}catch(IOException e){
 			fileScan.put("error","予期せぬエラーが発生しました");
 			return fileScan;
 		}
 		return fileScan;
 	}
 	//各合計売上の計算
-	public static Map<String,Long> aggregate(String category,int i,String code,String rcdFile,int codeLength,ArrayList<String> valueTemp,Map<String,Long> salesString,Map<String,String> codePosition){
-		Long  aggregate = 0L;
-		if(code.length() != codeLength || !codePosition.containsKey(code)) { //１行目にコードがない場合
-			salesString.put(rcdFile + "の" + category + "コードが不正です",10000000001L);
-			return salesString;
-		}
-		Long rcdSales = new Long(valueTemp.get(2));//今回取得した売上
+	public static Map<String,Long> aggregate(String category,int i,ArrayList<String> rcdContent,Map<String,Long> salesString){
+		Long aggregate = 0L;
+		Long rcdSales = new Long(rcdContent.get(2));//今回取得した売上
 		//売上金額格納	
-		aggregate = salesString.get(valueTemp.get(i)) + rcdSales;//支店売上
+		aggregate = salesString.get(rcdContent.get(i)) + rcdSales;//支店売上
 		if(aggregate >= 10000000000L){
-			salesString.put("合計金額が10桁を超えました",10000000001L);
+			salesString.put("error",10000000001L);
+			System.out.println("合計金額が10桁を超えました");
 			return salesString;
 		}
-		salesString.put(valueTemp.get(i),aggregate);
+		salesString.put(rcdContent.get(i),aggregate);
 		return salesString;
 	}
 	//支店ごと,商品ごとの売り上げ
 	public static void filePrint(String place,String fileName,Map<String,Long> sales,Map<String,String> namePosition)throws IOException{
 		String crlf = System.getProperty("line.separator");
 		//並び替え
-		List<Map.Entry<String,Long>> sort = new ArrayList<Map.Entry<String,Long>>(sales.entrySet());
-		Collections.sort(sort, new Comparator<Map.Entry<String,Long>>() {
-			public int compare(
-			Entry<String,Long> sort1, Entry<String,Long> sort2) {
-			return ((Long)sort2.getValue()).compareTo((Long)sort1.getValue());
+		List<Entry<String,Long>> sort = new ArrayList<Entry<String,Long>>(sales.entrySet());
+		Collections.sort(sort, new Comparator<Map.Entry<String,Long>>(){
+			public int compare(Entry<String,Long> sort1, Entry<String,Long> sort2){
+				return (sort2.getValue()).compareTo(sort1.getValue());
 			}
-			});
+		});
 		//ここまで
 		File file = new File(place + File.separator + fileName);
 		FileWriter fileWriter = new FileWriter(file);
 		BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-		for (Entry<String,Long> i : sort) {
+		for(Entry<String,Long> i : sort){
 			bufferedWriter.write(i.getKey() + "," + namePosition.get(i.getKey()) + "," + i.getValue() + crlf);
 		}
 		bufferedWriter.close();

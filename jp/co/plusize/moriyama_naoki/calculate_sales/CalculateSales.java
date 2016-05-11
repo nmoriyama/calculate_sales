@@ -20,10 +20,10 @@ public class CalculateSales {
 		ArrayList<String> rcdFileList = new ArrayList<String>();
 		ArrayList<Integer> sequenceCheck = new ArrayList<Integer>();
 		
-		Map<String,Integer> branchSales = new HashMap<String,Integer>();//キー:支店コード , 要素:売上金額
+		Map<String,Long> branchSales = new HashMap<String,Long>();//キー:支店コード , 要素:売上金額
 		Map<String,String> branchName = new HashMap<String,String>();
 
-		Map<String,Integer> commoditySales = new HashMap<String,Integer>();//キー:商品コード , 要素:売上金額
+		Map<String,Long> commoditySales = new HashMap<String,Long>();//キー:商品コード , 要素:売上金額
 		Map<String,String> commodityName = new HashMap<String,String>();
 		String[] branch = new String[2];
 		branch[0] = "branch.lst";
@@ -47,7 +47,7 @@ public class CalculateSales {
 				return;
 			}
 			for (String getCode : branchName.keySet()) {
-				branchSales.put(getCode,0);
+				branchSales.put(getCode,0L);
 			}
 			commodityName = fileScan(args[0],commodity[0],"商品");		//2商品定義ファイルの読み込み
 			if(commodityName.containsKey("error")){
@@ -55,7 +55,7 @@ public class CalculateSales {
 				return;
 			}
 			for (String getCode : commodityName.keySet()) {
-				commoditySales.put(getCode,0);
+				commoditySales.put(getCode,0L);
 			}
 			//3集計
 			//売上ファイルのある場所の検索
@@ -188,38 +188,38 @@ public class CalculateSales {
 		return fileScan;
 	}
 	//各合計売上の計算
-	public static Map<String,Integer> aggregate(String category,int i,String code,String rcdFile,int codeLength,ArrayList<String> valueTemp,Map<String,Integer> salesString,Map<String,String> codePosition){
+	public static Map<String,Long> aggregate(String category,int i,String code,String rcdFile,int codeLength,ArrayList<String> valueTemp,Map<String,Long> salesString,Map<String,String> codePosition){
 		Long  aggregate = 0L;
 		if(code.length() != codeLength || !codePosition.containsKey(code)) { //１行目にコードがない場合
-			salesString.put(rcdFile + "の" + category + "コードが不正です",1000000001);
+			salesString.put(rcdFile + "の" + category + "コードが不正です",10000000001L);
 			return salesString;
 		}
-		long rcdSales = new Long(valueTemp.get(2));//今回取得した売上
+		Long rcdSales = new Long(valueTemp.get(2));//今回取得した売上
 		//売上金額格納	
 		aggregate = salesString.get(valueTemp.get(i)) + rcdSales;//支店売上
-		if(aggregate > 10000000000L){
-			salesString.put("合計金額が10桁を超えました",1000000001);
+		if(aggregate >= 10000000000L){
+			salesString.put("合計金額が10桁を超えました",10000000001L);
 			return salesString;
 		}
-		salesString.put(valueTemp.get(i),aggregate.intValue());
+		salesString.put(valueTemp.get(i),aggregate);
 		return salesString;
 	}
 	//支店ごと,商品ごとの売り上げ
-	public static void filePrint(String place,String fileName,Map<String,Integer> sales,Map<String,String> namePosition)throws IOException{
+	public static void filePrint(String place,String fileName,Map<String,Long> sales,Map<String,String> namePosition)throws IOException{
 		String crlf = System.getProperty("line.separator");
 		//並び替え
-		List<Map.Entry<String,Integer>> sort = new ArrayList<Map.Entry<String,Integer>>(sales.entrySet());
-		Collections.sort(sort, new Comparator<Map.Entry<String,Integer>>() {
+		List<Map.Entry<String,Long>> sort = new ArrayList<Map.Entry<String,Long>>(sales.entrySet());
+		Collections.sort(sort, new Comparator<Map.Entry<String,Long>>() {
 			public int compare(
-			Entry<String,Integer> sort1, Entry<String,Integer> sort2) {
-			return ((Integer)sort2.getValue()).compareTo((Integer)sort1.getValue());
+			Entry<String,Long> sort1, Entry<String,Long> sort2) {
+			return ((Long)sort2.getValue()).compareTo((Long)sort1.getValue());
 			}
 			});
 		//ここまで
 		File file = new File(place + File.separator + fileName);
 		FileWriter fileWriter = new FileWriter(file);
 		BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-		for (Entry<String,Integer> i : sort) {
+		for (Entry<String,Long> i : sort) {
 			bufferedWriter.write(i.getKey() + "," + namePosition.get(i.getKey()) + "," + i.getValue() + crlf);
 		}
 		bufferedWriter.close();

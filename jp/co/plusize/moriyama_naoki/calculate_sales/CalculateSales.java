@@ -189,19 +189,21 @@ public class CalculateSales {
 	}
 	//各合計売上の計算
 	public static Map<String,Integer> aggregate(String category,int i,String code,String rcdFile,int codeLength,ArrayList<String> valueTemp,Map<String,Integer> salesString,Map<String,String> codePosition){
-		long  aggregate = 0;
+		Long  aggregate = 0L;
 		if(code.length() != codeLength || !codePosition.containsKey(code)) { //１行目にコードがない場合
 			salesString.put(rcdFile + "の" + category + "コードが不正です",1000000001);
 			return salesString;
 		}
 		long rcdSales = new Long(valueTemp.get(2));//今回取得した売上
 		//売上金額格納	
+		
 		aggregate = salesString.get(valueTemp.get(i)) + rcdSales;//支店売上
-		if(aggregate >= 1000000000){
+		System.out.println(aggregate+"  ,  "+valueTemp.get(i));
+		if(aggregate > 10000000000L){
 			salesString.put("合計金額が10桁を超えました",1000000001);
 			return salesString;
 		}
-		salesString.put(valueTemp.get(i),(int)aggregate);
+		salesString.put(valueTemp.get(i),aggregate.intValue());
 		return salesString;
 	}
 	//支店ごと,商品ごとの売り上げ

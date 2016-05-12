@@ -128,11 +128,11 @@ public class CalculateSales {
 		String line;
 		while ((line = bufferedReader.readLine()) != null) {
 			String[] lineDivision = line.split(",");// , で分割
-			fileScan.put(lineDivision[0], lineDivision[1]);//キー:コード , 要素:名前
 			if (lineDivision.length != 2 || ! lineDivision[0].matches(lstFile[3])) {//読み込んだファイルの形式が正しいか
 				fileScan.put("error", lstFile[2] + "定義ファイルのフォーマットが不正です");
 				return fileScan;
-			}	
+			}
+			fileScan.put(lineDivision[0], lineDivision[1]);//キー:コード , 要素:名前	
 		}
 		bufferedReader.close();
 		return fileScan;
